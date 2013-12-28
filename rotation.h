@@ -70,5 +70,13 @@ inline bool operator!=(const rotation& lhs, const rotation& rhs)
     return !operator==(lhs,rhs);
 }
 
+inline std::ostream& operator<<(std::ostream& os, const rotation& r)
+{
+    os << r.quat_.x() << " "
+        << r.quat_.y() << " "
+        << r.quat_.z() << " "
+        << r.quat_.w();
+}
+
 
 #endif

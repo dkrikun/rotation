@@ -2,47 +2,143 @@
 
 #include <iostream>
 #include <assert.h>
+#include <vector>
 
 
 int main(int argc, char** argv)
 {
+    using namespace Eigen;
     double eps = 0.5;
 
     rotation zero_rotation = rotation::make_identity();
 
-    rotation r1(30.,40.,50.), r2(90.,90.,90.),
-        r3(-20.,45.,100.), r4(-180.,90.,125.),
-        r5(-729., 800., 1900.);
+# if 1
+    IOFormat CommaInitFmt(StreamPrecision, DontAlignCols, ", ", ", ", "", "", " << ", ";");
+    IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+    IOFormat OctaveFmt(StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");
+    IOFormat HeavyFmt(FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
+# endif
 
-    rotation rs[] = { r1, r2, r3, r4, r5 };
 
-    for(int j = 0; j<4; ++j)
+    std::vector<double> degs;
+    degs.push_back(-361.);
+    degs.push_back(-360.2);
+    degs.push_back(-360.1);
+    degs.push_back(-360.001);
+    degs.push_back(-360.);
+    degs.push_back(-359.999);
+    degs.push_back(-359.9);
+    degs.push_back(-359.8);
+    degs.push_back(-359.);
+    degs.push_back(-271.);
+    degs.push_back(-270.2);
+    degs.push_back(-270.1);
+    degs.push_back(-270.001);
+    degs.push_back(-270.);
+    degs.push_back(-269.999);
+    degs.push_back(-269.9);
+    degs.push_back(-269.8);
+    degs.push_back(-181.);
+    degs.push_back(-180.2);
+    degs.push_back(-180.1);
+    degs.push_back(-180.001);
+    degs.push_back(-180.);
+    degs.push_back(-179.999);
+    degs.push_back(-179.9);
+    degs.push_back(-179.8);
+    degs.push_back(-178.);
+    degs.push_back(-91.);
+    degs.push_back(-90.2);
+    degs.push_back(-90.1);
+    degs.push_back(-90.001);
+    degs.push_back(-90.);
+    degs.push_back(-89.999);
+    degs.push_back(-89.9);
+    degs.push_back(-89.8);
+    degs.push_back(-88.);
+
+# if 0
+    degs.push_back(-1.);
+    degs.push_back(-0.2);
+    degs.push_back(-0.1);
+    degs.push_back(-0.001);
+    degs.push_back(+0.);
+    degs.push_back(+0.001);
+    degs.push_back(+0.1);
+    degs.push_back(+0.2);
+    degs.push_back(+1.);
+
+    degs.push_back(+361.);
+    degs.push_back(+360.2);
+    degs.push_back(+360.1);
+    degs.push_back(+360.001);
+    degs.push_back(+360.);
+    degs.push_back(+359.999);
+    degs.push_back(+359.9);
+    degs.push_back(+359.8);
+    degs.push_back(+359.);
+    degs.push_back(+271.);
+    degs.push_back(+270.2);
+    degs.push_back(+270.1);
+    degs.push_back(+270.001);
+    degs.push_back(+270.);
+    degs.push_back(+269.999);
+    degs.push_back(+269.9);
+    degs.push_back(+269.8);
+    degs.push_back(+181.);
+    degs.push_back(+180.2);
+    degs.push_back(+180.1);
+    degs.push_back(+180.001);
+    degs.push_back(+180.);
+    degs.push_back(+179.999);
+    degs.push_back(+179.9);
+    degs.push_back(+179.8);
+    degs.push_back(+178.);
+    degs.push_back(+91.);
+    degs.push_back(+90.2);
+    degs.push_back(+90.1);
+    degs.push_back(+90.001);
+    degs.push_back(+90.);
+    degs.push_back(+89.999);
+    degs.push_back(+89.9);
+    degs.push_back(+89.8);
+    degs.push_back(+89.);
+# endif
+
+    std::cout << "degs.size()=" << degs.size() << std::endl;
+
+    for(int xj = 0; xj <= degs.size(); xj++)
+    for(int yj = 0; yj <= degs.size(); yj++)
+    for(int zj = 0; zj <= degs.size(); zj++)
     {
-        rotation& rj = rs[j];
+        rotation r(degs[xj], degs[yj], degs[zj]);
 
-        assert( rj + (-rj) == zero_rotation );
-        assert( rj - rj - rj == -rj );
-        assert( rj != -rj );
-        assert( rj != zero_rotation );
+        assert( r + (-r) == zero_rotation );
+        assert( r - r - r == -r );
 
-        rotation rr = rotation::from_vec(rj.hpr());
+        rotation rr = rotation::from_vec(r.hpr());
+# if 0
+        if(rr != r)
+        {
+            std::cout << "r=[" << r << "]" << std::endl;
+            std::cout << "rr=[" << rr << "]" << std::endl;
+            std::cout << "xyz=" << x << " " << y << " " << z << std::endl;
+        }
+# endif
+        assert( rr == r );
 
-        std::cout << "------\n"
-            << rj.hpr() << " -- " << rr.hpr() << std::endl;
+        for(int vxj = 0; vxj <= degs.size(); vxj++)
+        for(int vyj = 0; vyj <= degs.size(); vyj++)
+        for(int vzj = 0; vzj <= degs.size(); vzj++)
+        {
+            Vector3d xyz(degs[vxj],degs[vyj],degs[vzj]);
 
+            Vector3d rr_xyz = rr.quat_._transformVector(xyz);
+            Vector3d r_xyz = r.quat_._transformVector(xyz);
 
-        assert( rr == rj );
-
-        using namespace Eigen;
-
-        Vector3d xyz(30.,20.,35.);
-
-        Vector3d rr_xyz = rr.quat_._transformVector(xyz);
-        Vector3d rj_xyz = rj.quat_._transformVector(xyz);
-
-        std::cout << "*** " << rr_xyz << " &&& " << rj_xyz << " ^^^" << std::endl;
-
-        assert( rr_xyz == rj_xyz );
+            assert( rr_xyz.isApprox(r_xyz) );
+        }
+        std::cout << ".";
     }
 
 

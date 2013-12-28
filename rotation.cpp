@@ -59,7 +59,8 @@ void rotation_inverse(rotation* self)
 
 bool rotation_equivalent(const rotation &lhs, const rotation& rhs)
 {
-    return lhs.quat_.isApprox(rhs.quat_);
+    return lhs.quat_.isApprox(rhs.quat_)
+        || lhs.quat_.coeffs().isApprox(-rhs.quat_.coeffs());
 }
 
 Vector3d rotation_hpr(const rotation& self)
